@@ -1,0 +1,2 @@
+[workspace]
+members = ["rules/arithmetic_op"]
