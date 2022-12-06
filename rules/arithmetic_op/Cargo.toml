@@ -1,8 +1,8 @@
 [package]
 name = "arithmetic_op"
 version = "0.1.0"
-authors = ["authors go here"]
-description = "description goes here"
+authors = ["Kevin Wang <wy721@qq.com>"]
+description = "Lint against directly using arithmetic operators in code"
 edition = "2021"
 publish = false
 
@@ -13,10 +13,6 @@ crate-type = ["cdylib"]
 clippy_utils = { git = "https://github.com/rust-lang/rust-clippy", rev = "e43f5a17d4d9263616ae6fc28a7c5353e80d8a12" }
 dylint_linting = "2.0.13"
 if_chain = "1.0.2"
-
-# for RA
-# rustc_lint = { path = "/home/kvin/.rustup/toolchains/nightly-2022-09-29-x86_64-unknown-linux-gnu/lib/rustlib/rustc-src/rust/compiler/rustc_lint" }
-# rustc_hir = { path = "/home/kvin/.rustup/toolchains/nightly-2022-09-29-x86_64-unknown-linux-gnu/lib/rustlib/rustc-src/rust/compiler/rustc_hir" }
 
 [dev-dependencies]
 dylint_testing = "2.0.13"

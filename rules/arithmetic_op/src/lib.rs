@@ -7,7 +7,7 @@ use clippy_utils::diagnostics::span_lint_and_help;
 
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
-    
+
 dylint_linting::declare_late_lint! {
     /// **What it does:**
     ///
@@ -22,27 +22,18 @@ dylint_linting::declare_late_lint! {
     /// Regardless of whether the framework enables checks, we should always be careful when doing
     /// arithmetic calculations.
     ///
-    /// **Example:**
+    /// Instead of using arithmetic operators directly, it is recommended to use the `checked_*`
+    /// methods, such as `checked_mul()` or `checked_add()`, to perform arithmetic operations. These
+    /// methods will return None if an overflow occurs, allowing you to handle the error safely.
+    /// For example, instead of using the `*` operator to multiply two numbers, you can use
+    /// `checked_mul()` to perform the same operation in a safe manner:
     ///
     /// ```rust
-    /// // example code where a warning is issued
+    /// // Bad: directly using the `*` operator
     /// let amount = price * items;
-    /// ```
-    /// Use instead:
-    /// ```rust
-    /// // example code that does not raise a warning
+
+    /// // Good: using the `checked_mul()` method
     /// let amount = price.checked_mul(items);
-    /// ```
-    /// 
-    /// Instead of:
-    /// ```
-    /// // example code where a warning is issued
-    /// let released = original_stake - slashed;
-    /// ```
-    /// Prefer:
-    /// ```rust
-    /// // example code that does not raise a warning
-    /// let released = original_stake.saturating_sub(slashed);
     /// ```
     pub ARITHMETIC_OP,
     Warn,
@@ -53,24 +44,22 @@ impl<'tcx> LateLintPass<'tcx> for ArithmeticOp {
     fn check_expr(&mut self, ctx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         use rustc_hir::BinOpKind::*;
         match expr.kind {
-            ExprKind::AssignOp(op, a, b) | ExprKind::Binary(op, a, b) => {
-                match op.node {
-                    Add | Sub | Mul | Div => {
-                        if let (ExprKind::Lit(_), _) | (_, ExprKind::Lit(_)) = (&a.kind, &b.kind) {
-                            return;
-                        }
-                        span_lint_and_help(
-                            ctx,
-                            ARITHMETIC_OP,
-                            expr.span,
-                            "directly using the arithmetic operator",
-                            None,
-                            "consider using the saturating or checked version calls",
-                        );
+            ExprKind::AssignOp(op, a, b) | ExprKind::Binary(op, a, b) => match op.node {
+                Add | Sub | Mul | Div => {
+                    if let (ExprKind::Lit(_), _) | (_, ExprKind::Lit(_)) = (&a.kind, &b.kind) {
+                        return;
                     }
-                    _ => (),
+                    span_lint_and_help(
+                        ctx,
+                        ARITHMETIC_OP,
+                        expr.span,
+                        "directly using the arithmetic operator",
+                        None,
+                        "consider using the saturating or checked version calls",
+                    );
                 }
-            }
+                _ => (),
+            },
             _ => (),
         }
     }
